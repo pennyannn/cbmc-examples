@@ -1,0 +1,6 @@
+module Mul32 where
+
+Q = 3329
+
+mul32 : [32] -> [32] -> [32]
+mul32 a b = a * b % Q

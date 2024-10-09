@@ -1,0 +1,49 @@
+import "Mul32.cry";
+
+// load testall LLVM bytecode
+m <- llvm_load_module "../testall.bc";
+
+let mul32_spec = do {
+  a <- crucible_fresh_var "a" (llvm_int 32);
+  b <- crucible_fresh_var "b" (llvm_int 32);
+
+  crucible_precond {{ a < Q }};
+  crucible_precond {{ b < Q }};
+
+  crucible_execute_func [ (crucible_term a), (crucible_term b) ];
+
+  crucible_return (crucible_term {{ mul32 a b }});
+};
+
+
+// Around 80 seconds
+print "Verifying mul32 using cvc5 ...";
+llvm_verify
+  m "mul32" [] true
+  (mul32_spec)
+  (do { w4_unint_cvc5 [];
+  });
+
+// Around 106 seconds
+print "Verifying mul32 using z3 ...";
+llvm_verify
+  m "mul32" [] true
+  (mul32_spec)
+  (do { w4_unint_z3 [];
+  });
+
+let mul_ref_spec = do {
+  a <- crucible_fresh_var "a" (llvm_int 32);
+  b <- crucible_fresh_var "b" (llvm_int 32);
+
+  crucible_execute_func [ (crucible_term a), (crucible_term b) ];
+
+  crucible_return (crucible_term {{ mul32 a b }});
+};
+
+print "Verifying equivalence between mul_ref and the cryptol spec";
+llvm_verify
+  m "mul_ref" [] false
+  (mul_ref_spec)
+  (do { w4_unint_z3 [];
+  });

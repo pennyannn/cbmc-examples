@@ -1,7 +1,8 @@
 FILE = mul
 TARGET ?= mul32_proved
 
-CC=clang
+# TODO: make CC passed in from commandline
+CC=wllvm
 
 CHECKS=--bounds-check --pointer-check \
        --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
