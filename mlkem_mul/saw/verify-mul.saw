@@ -7,8 +7,9 @@ let mul32_spec = do {
   a <- crucible_fresh_var "a" (llvm_int 32);
   b <- crucible_fresh_var "b" (llvm_int 32);
 
-  crucible_precond {{ a < Q }};
-  crucible_precond {{ b < Q }};
+  // bound : sqrt((2^32 - 1)/315)
+  crucible_precond {{ a <= 3692 }};
+  crucible_precond {{ b <= 3692 }};
 
   crucible_execute_func [ (crucible_term a), (crucible_term b) ];
 
@@ -16,7 +17,6 @@ let mul32_spec = do {
 };
 
 
-// Around 80 seconds
 print "Verifying mul32 using cvc5 ...";
 llvm_verify
   m "mul32" [] true
@@ -24,7 +24,6 @@ llvm_verify
   (do { w4_unint_cvc5 [];
   });
 
-// Around 106 seconds
 print "Verifying mul32 using z3 ...";
 llvm_verify
   m "mul32" [] true
