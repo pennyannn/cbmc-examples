@@ -46,3 +46,15 @@ llvm_verify
   (mul_ref_spec)
   (do { w4_unint_z3 [];
   });
+
+
+// Direct equivalence between mul_ref and mul_32
+print "Extracting reference term: mul_ref";
+mul_ref <- llvm_extract m "mul_ref";
+print "Extracting implementation term: mul32";
+mul32 <- llvm_extract m "mul32";
+
+print "Proving equivalence: mul_ref == mul32";
+let thm = {{ \a b -> (a <= 3692) && (b <= 3692) ==> mul_ref a b == mul32 a b }};
+result <- prove cvc5 thm;
+print result;
